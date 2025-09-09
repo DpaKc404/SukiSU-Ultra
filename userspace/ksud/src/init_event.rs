@@ -10,7 +10,12 @@ use std::path::Path;
 pub fn on_post_data_fs() -> Result<()> {
     ksucalls::report_post_fs_data();
 
-    kpm::start_kpm_watcher()?;
+    if kpm::is_kpm_enabled()? {
+        // start kpm watcher
+        kpm::start_kpm_watcher()?;
+        // load kpm modules
+        kpm::load_kpm_modules()?;
+    }
 
     utils::umask(0);
 
@@ -106,9 +111,6 @@ pub fn on_post_data_fs() -> Result<()> {
     }
 
     run_stage("post-mount", true);
-
-    // load kpm modules
-    kpm::load_kpm_modules()?;
 
     Ok(())
 }
